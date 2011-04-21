@@ -4,7 +4,9 @@
 
 #define TIME_FMT "%a %D %I:%M%p"
 #define SBAR 64
-#define SLEEPYTIME 10
+#define SLEEPYTIME 4
+
+#define STATUSBAR_FILE "/rbar/status"
 
 #define WMII_STATUSBAR_H
 #endif

@@ -1,5 +1,5 @@
 CFLAGS=-std=gnu99 -ggdb -Wall -Wextra -pedantic
-LDFLAGS=-lasound
+LDFLAGS=-lasound -lixp 
 CC=i686-pc-linux-gnu-gcc
 
 .PHONY: clean all tags

@@ -21,10 +21,12 @@ int main(void) {
 	}
 
 	fid = ixp_open(client, fname, P9_OWRITE);
+
 	if (len != ixp_write(fid, message, len)) {
 		fatal("cannot write file %q\n", fname);
 	}
 
+	ixp_close(fid);
 	ixp_unmount(client);
 	return 0;
 }
