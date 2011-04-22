@@ -166,3 +166,58 @@ char* getMemory(char* buf) {
 	return buf;
 }
 
+
+/*
+ * get battery time left
+ */
+char* getBatteryTime(char* buf) {
+	char *present, *discharging;
+	int rate, remaining;
+	int hours, minutes;
+
+	readProcFile("acpi/battery/BAT0/state", buf);
+
+	/* printf("read in:\n===\n%s\n===\n\n", buf); */ /*DELETE ME*/
+
+	/* is battery present? */
+	strtok(buf, " ");
+	present = strtok(NULL, " ");
+	/* printf("PRESENT: %s\n", present); */ /* DELETE ME */
+	/* printf("PRESENT? %c\n\n", *present == 'y' ? 'y' : 'n'); */ /* DELETE ME */
+
+	if (*present == 'y') {
+		/* discharging? */
+		strtok(NULL, " ");
+		strtok(NULL, " ");
+		strtok(NULL, " ");
+		discharging = strtok(NULL, " ");
+		/* printf("DISCHARGING:\n===\n%s\n===\n\n", discharging); */ /* DELETE ME */
+		/* printf("DISCHARGING? %c\n\n", *discharging == 'd' ? 'y' : 'n'); */ /* DELETE ME */
+
+		/* rate */
+		strtok(NULL, " ");
+		rate = atoi(strtok(NULL, " "));
+		/* printf("RATE:\n===\n%d\n===\n\n", rate); */ /* DELETE ME */
+
+		/* remaining capacity, converted to mA minutes */
+		strtok(NULL, " ");
+		strtok(NULL, " ");
+		remaining = 60 * atoi(strtok(NULL, " "));
+		/* printf("REMAINING:\n===\n%d\n===\n\n", remaining); */ /* DELETE ME */
+
+		minutes = remaining / rate;
+		hours = minutes / 60;
+		minutes %= 60;
+
+		snprintf(buf, SBAR, "Bat:%d.%d%c",
+				hours,
+				minutes,
+				*discharging == 'd' ? '-' : '+');
+	}
+	else {
+		snprintf(buf, SBAR, "ACpwr");
+	}
+
+	return buf;
+}
+

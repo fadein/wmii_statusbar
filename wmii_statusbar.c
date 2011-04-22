@@ -89,7 +89,10 @@ int main(void) {
 		strncat(out, getMemory(buf), (size_t) SBAR);
 		strncat(out, " ", (size_t) SBAR);
 
-		strncat(out, getLoadAve(buf), (size_t) SBAR);
+		strncat(out, getBatteryTime(buf), (size_t) SBAR);
+		strncat(out, " ", (size_t) SBAR);
+
+		/* strncat(out, getLoadAve(buf), (size_t) SBAR); */
 		/* strncat(out, " ", (size_t) SBAR); */
 
 		strncat(out, getDateTime(buf), (size_t) SBAR);
