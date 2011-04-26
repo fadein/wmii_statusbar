@@ -199,20 +199,26 @@ char* getBatteryTime(char* buf) {
 		rate = atoi(strtok(NULL, " "));
 		/* printf("RATE:\n===\n%d\n===\n\n", rate); */ /* DELETE ME */
 
-		/* remaining capacity, converted to mA minutes */
-		strtok(NULL, " ");
-		strtok(NULL, " ");
-		remaining = 60 * atoi(strtok(NULL, " "));
-		/* printf("REMAINING:\n===\n%d\n===\n\n", remaining); */ /* DELETE ME */
+		if (0 == rate) {
+			snprintf(buf, SBAR, "Bat:FULL%c",
+					*discharging == 'd' ? '-' : '+');
+		}
+		else {
+			/* remaining capacity, converted to mA minutes */
+			strtok(NULL, " ");
+			strtok(NULL, " ");
+			remaining = 60 * atoi(strtok(NULL, " "));
+			/* printf("REMAINING:\n===\n%d\n===\n\n", remaining); */ /* DELETE ME */
 
-		minutes = remaining / rate;
-		hours = minutes / 60;
-		minutes %= 60;
+			minutes = remaining / rate;
+			hours = minutes / 60;
+			minutes %= 60;
 
-		snprintf(buf, SBAR, "Bat:%d.%d%c",
-				hours,
-				minutes,
-				*discharging == 'd' ? '-' : '+');
+			snprintf(buf, SBAR, "Bat:%d.%02d%c",
+					hours,
+					minutes,
+					*discharging == 'd' ? '-' : '+');
+		}
 	}
 	else {
 		snprintf(buf, SBAR, "ACpwr");
