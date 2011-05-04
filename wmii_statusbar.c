@@ -60,14 +60,7 @@ int main(void) {
 	}
 
 	for(;;) {
-
-		*out = '\0';
-		/*
-		 * get battery state
-		 * /proc/acpi/battery/BAT0/state
-		 */
-		//strncat(out, getBattery(buf), (size_t)SBAR);
-		//strncat(out, " | ", (size_t) SBAR);
+		strcpy(out, STATUSBAR_PREFIX);
 
 		/*
 		 * get wifi state, if wifi is on - icons?
@@ -76,9 +69,6 @@ int main(void) {
 		//strncat(out, getWifi(buf), (size_t)SBAR);
 		//strncat(out, " | ", (size_t) SBAR);
 
-		/*
-		 * get mixer volume
-		 */
 		strncat(out, "Vol:", (size_t)SBAR);
 		strncat(out, getAlsaVolume("Master"), (size_t)SBAR);
 		strncat(out, " ", (size_t) SBAR);

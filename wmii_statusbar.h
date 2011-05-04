@@ -4,9 +4,14 @@
 
 #define TIME_FMT "%a %D %I:%M%p"
 #define SBAR 64
-#define SLEEPYTIME 4
+#define SLEEPYTIME 2
 
 #define STATUSBAR_FILE "/rbar/status"
+
+/*
+ * beginning in wmii-hg the statusbar must begin with "label"
+ */
+#define STATUSBAR_PREFIX "label "
 
 #define WMII_STATUSBAR_H
 #endif
