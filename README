@@ -1,0 +1,41 @@
+DESIGN RATIONALE:
+=================
+
+Provides a statusbar for wmii by periodically writing a string out to
+/rbar/status via libixp.
+
+It aims to be more efficent than a pipeline of programs kicked off by a shell
+script.  Plus, I was having problems with that pipeline hanging around whenever
+I re-execed wmii - the effect was two or more processes competing to update my
+statusbar.
+
+This version of wmii_statusbar works with the latest Hg version of wmii - it
+won't work with the outdated wmii tarball that everybody seems to be tripping
+over.
+
+INSTALL INSTRUCTIONS:
+=====================
+1. Prerequisites:
+	libixp: libixp is a stand-alone client/server 9P library
+	http://libs.suckless.org/libixp
+
+	alsa-lib: for volume information.  If you don't want to display the volume,
+	you can hack alsavolume.[ch] out of the Makefile, and remove
+	getAlsaVolume() from wmii_statusbar.c.
+
+2. Hack wmii_statusbar.[ch] to your liking.  By default, you'll get a statusbar
+	that looks like this:
+	Vol:XX% CPU:XX% Mem:XX% Bat:hrs.min %a %D %I:%M%p
+	It will refresh itself every 2 seconds.
+
+3. Finally, you need to tell your wmiirc how to kick this off.  In my wmiirc, I
+   replaced the Action status stanza with this:
+
+Action status
+    set +xv
+    if wmiir remove /rbar/status 2>/dev/null; then
+        sleep 2
+    fi
+    echo colors "$WMII_FOCUSCOLORS" | wmiir create /rbar/status
+    $HOME/.wmii-hg/wmii_statusbar
+

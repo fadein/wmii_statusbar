@@ -1,6 +1,6 @@
 CFLAGS=-std=gnu99 -ggdb -Wall -Wextra -pedantic
 LDFLAGS=-lasound -lixp 
-CC=i686-pc-linux-gnu-gcc
+CC=gcc
 
 .PHONY: clean all tags
 
@@ -18,7 +18,7 @@ clean:
 	rm -f *.o a.out tags wmii_statusbar
 
 tags:
-	@echo Plz install exuberant-ctags, yo
+	ctags *
 
 simple_volume.o: simple_volume.c
 	gcc -c -o $@ $^ $(CFLAGS)
