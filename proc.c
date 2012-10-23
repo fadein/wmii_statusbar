@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "wmii_statusbar.h"
+#include "statusbar.h"
 
 /*
  * Read READBUFFER bytes from the specified /proc file

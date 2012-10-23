@@ -6,13 +6,14 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <ixp.h>
+#include <X11/Xlib.h>
 
 #include "proc.h"
 #include "alsavolume.h"
 #include "statusbar.h"
-#include "wmii_statusbar.h"
+#include "dwm_statusbar.h"
 
+static Display *dpy;
 
 /*
  * get date & time
@@ -27,41 +28,30 @@ char* getDateTime(char* buf) {
 	return buf;
 }
 
-#define fatal(...) ixp_eprint("ixpc: fatal: " __VA_ARGS__);
-
-static int ixpWrite(IxpClient *client, char* buf, int buflen) {
-	static IxpCFid *fid;
-	int len;
-
-	fid = ixp_open(client, STATUSBAR_FILE, P9_OWRITE);
-
-	if (buflen != (len = ixp_write(fid, buf, buflen))) {
-		fatal("cannot write file %q\n", STATUSBAR_FILE);
-	}
-
-	ixp_close(fid);
-	return len;
+void
+setstatus(char *str)
+{
+	XStoreName(dpy, DefaultRootWindow(dpy), str);
+	XSync(dpy, False);
 }
 
-int main(void) {
+int
+main(void)
+{
 	char out[SBAR];
-	IxpClient *client;
-	char *buf = (char*)malloc(sizeof(char) * READBUFFER);
+	char *buf;
 
-	/* initiate connection to IxpClient */
-	client = ixp_nsmount("wmii");
-	if (NULL == client) {
-		fatal("can't mount: %r\n");
+	if (!(dpy = XOpenDisplay(NULL))) {
+		fprintf(stderr, "XOpenDisplay() FAIL\n");
+		return 1;
 	}
+
+	if (NULL == (buf = (char*)malloc(sizeof(char) * READBUFFER)))
+		error_at_line(1, errno, __FILE__, __LINE__, "malloc() FAIL");
 
 	memset(&out, '\0', (size_t)SBAR);
 
-	if (NULL == buf) {
-		error_at_line(1, errno, __FILE__, __LINE__, "malloc() FAIL");
-	}
-
 	for(;;) {
-		strcpy(out, STATUSBAR_PREFIX);
 
 		/*
 		 * get wifi state, if wifi is on - icons?
@@ -93,9 +83,8 @@ int main(void) {
 		/* printf("%s", out); */
 		/* printf("\n"); */ /* DELETE ME */
 
-		ixpWrite(client, out, strlen(out));
+		setstatus(out);
 		sleep(SLEEPYTIME);
 	}
 
-	ixp_unmount(client);
 }

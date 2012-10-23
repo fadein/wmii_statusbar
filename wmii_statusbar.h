@@ -1,11 +1,11 @@
 #ifndef WMII_STATUSBAR_H
+#define WMII_STATUSBAR_H
 
-#define READBUFFER 4096
+#define VERSION        "1.0"
 
-#define TIME_FMT "%a %D %I:%M%p"
-#define SBAR 64
-#define SLEEPYTIME 2
-
+/*
+ * name of the wmii IXP statusbar file
+ */
 #define STATUSBAR_FILE "/rbar/status"
 
 /*
@@ -13,5 +13,4 @@
  */
 #define STATUSBAR_PREFIX "label "
 
-#define WMII_STATUSBAR_H
 #endif

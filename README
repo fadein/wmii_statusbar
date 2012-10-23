@@ -1,6 +1,14 @@
 DESIGN RATIONALE:
 =================
 
+dwm_statusbar
+-------------
+Provides a statusbar for dwm by periodically setting the name of the
+root window.
+
+
+wmii_statusbar
+--------------
 Provides a statusbar for wmii by periodically writing a string out to
 /rbar/status via libixp.
 
@@ -15,6 +23,10 @@ over.
 
 INSTALL INSTRUCTIONS:
 =====================
+
+wmii_statusbar
+--------------
+
 1. Prerequisites:
 	libixp: libixp is a stand-alone client/server 9P library
 	http://libs.suckless.org/libixp
