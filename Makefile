@@ -1,7 +1,7 @@
 CFLAGS=-std=gnu99 -ggdb -Wall -Wextra -pedantic
 
-WMII_LDFLAGS=-lasound -lixp $(LDFLAGS)
-DWM_LDFLAGS=-lasound -lX11 $(LDFLAGS)
+WMII_LDFLAGS=-lasound -lm -lixp $(LDFLAGS)
+DWM_LDFLAGS=-lasound -lm -lX11 $(LDFLAGS)
 CC=gcc
 
 .PHONY: clean all tags

@@ -51,7 +51,7 @@ main(void)
 
 	memset(&out, '\0', (size_t)SBAR);
 
-	for(;;) {
+	for (;; *out = '\0', sleep(SLEEPYTIME) ) {
 
 		/*
 		 * get wifi state, if wifi is on - icons?
@@ -79,12 +79,12 @@ main(void)
 		strncat(out, getDateTime(buf), (size_t) SBAR);
 		/* strncat(out, " | ", (size_t) SBAR);*/
 
-		/* printf("\n\nthe string:\n"); */ /* DELETE ME */
-		/* printf("%s", out); */
-		/* printf("\n"); */ /* DELETE ME */
+		/*
+		printf("\n\nthe string:\n");
+		printf("%s", out);
+		printf("\n");
+		*/
 
 		setstatus(out);
-		sleep(SLEEPYTIME);
 	}
-
 }
