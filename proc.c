@@ -15,7 +15,6 @@
  * also return pointer to buf
  */
 static char* readProcFile(const char* file, char* buf) {
-	static size_t count;
 	static FILE *info;
 	static char procpath[PATH_MAX];
 
@@ -26,7 +25,7 @@ static char* readProcFile(const char* file, char* buf) {
 		error_at_line(1, errno, __FILE__, __LINE__, "fopen(%s) FAIL", file);
 	}
 
-	count = fread(buf, sizeof(char), READBUFFER, info);
+	(void) fread(buf, sizeof(char), READBUFFER, info);
 	if (ferror(info)) {
 		error_at_line(1, errno, __FILE__, __LINE__, "ferror(%s) FAIL", file);
 	}
