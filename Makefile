@@ -6,14 +6,15 @@ CC=gcc
 
 .PHONY: clean all tags
 
-all: wmii_statusbar dwm_statusbar
+all: dwm_statusbar
 
 objs = alsavolume.o proc.o xkb.o
 alsavolume.o: Makefile
-proc.o: Makefile wmii_statusbar.h
+proc.o: Makefile
 xkb.o: Makefile
 wmii_statusbar.o: Makefile wmii_statusbar.h proc.h alsavolume.h
-dwm_statusbar.o: Makefile dwm_statusbar.h proc.h alsavolume.h
+dwm_statusbar.o: Makefile dwm_statusbar.h proc.h alsavolume.h xkb.h
+
 
 wmii_statusbar: wmii_statusbar.c $(objs)
 	$(CC) -o $@ $^ $(CFLAGS) $(WMII_LDFLAGS)

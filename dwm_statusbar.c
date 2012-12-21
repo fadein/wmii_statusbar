@@ -9,6 +9,7 @@
 #include <X11/Xlib.h>
 
 #include "proc.h"
+#include "xkb.h"
 #include "alsavolume.h"
 #include "statusbar.h"
 #include "dwm_statusbar.h"
@@ -62,6 +63,10 @@ main(void)
 
 		strncat(out, "Vol:", (size_t)SBAR);
 		strncat(out, getAlsaVolume("Master"), (size_t)SBAR);
+		strncat(out, " ", (size_t) SBAR);
+
+		strncat(out, "Kb:", (size_t)SBAR);
+		strncat(out, xkbGetGroup(buf, (size_t) 2), (size_t)SBAR);
 		strncat(out, " ", (size_t) SBAR);
 
 		strncat(out, getCPU(buf), (size_t)SBAR);
