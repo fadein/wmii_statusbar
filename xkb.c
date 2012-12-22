@@ -10,16 +10,19 @@
 char* xkbGetGroup(char* buf, int len) {
 	int  xkbEventType, xkbError, reason_rtrn, mjr, mnr;
 	char *display_name;
-	Display *dpy;
 	XkbStateRec xkbstate;
-	XkbDescPtr xkbdesc = NULL;
+
+	static Display *dpy = NULL;
+	static XkbDescPtr xkbdesc = NULL;
 
 	/* Lets begin */
-	display_name = NULL;
-	mjr = XkbMajorVersion;
-	mnr = XkbMinorVersion;
-	dpy = XkbOpenDisplay(display_name, &xkbEventType, &xkbError,
-			&mjr, &mnr, &reason_rtrn);
+	if (!dpy) {
+		display_name = NULL;
+		mjr = XkbMajorVersion;
+		mnr = XkbMinorVersion;
+		dpy = XkbOpenDisplay(display_name, &xkbEventType, &xkbError,
+				&mjr, &mnr, &reason_rtrn);
+	}
 
 	if (dpy == NULL) {
 		strcpy(buf, "?");
