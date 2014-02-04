@@ -20,6 +20,6 @@
 /*
  * How many seconds to sleep between updates
  */
-#define SLEEPYTIME 2
+#define SLEEPYTIME 1
 
 #endif

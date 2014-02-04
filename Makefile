@@ -13,13 +13,13 @@ alsavolume.o: Makefile
 proc.o: Makefile
 xkb.o: Makefile
 wmii_statusbar.o: Makefile wmii_statusbar.h proc.h alsavolume.h
-dwm_statusbar.o: Makefile dwm_statusbar.h proc.h alsavolume.h xkb.h
+dwm_statusbar.o: Makefile dwm_statusbar.h proc.h alsavolume.h xkb.h statusbar.h
 
 
 wmii_statusbar: wmii_statusbar.c $(objs)
 	$(CC) -o $@ $^ $(CFLAGS) $(WMII_LDFLAGS)
 
-dwm_statusbar: dwm_statusbar.c $(objs)
+dwm_statusbar: dwm_statusbar.o $(objs)
 	$(CC) -o $@ $^ $(CFLAGS) $(DWM_LDFLAGS)
 
 battery: battery.c proc.o

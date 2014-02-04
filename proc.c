@@ -86,7 +86,7 @@ char* getCPU(char* buf) {
 		prvNice = atoi(strtok(NULL, " "));   /* get nice ticks */
 		prvSystem = atoi(strtok(NULL, " ")); /* get system ticks */
 		prvIdle = atoi(strtok(NULL, " "));   /* get idle ticks */
-		sprintf(buf, "CPU:N/A");
+		strcpy(buf, "CPU:N/A");
 	}
 	else {
 		user = atoi(strtok(NULL, " "));   /* get user ticks */
@@ -104,10 +104,15 @@ char* getCPU(char* buf) {
 		prvSystem = system;
 		prvIdle = idle;
 
-		sprintf(buf, "CPU:%d%%",
-					100 * (difUser + difSystem)
-								   /
-				(difUser + difSystem + difNice + difIdle));
+		if (0 == (difUser + difSystem + difNice + difIdle)) {
+			strcpy(buf, "CPU:N/A");
+		}
+		else {
+			sprintf(buf, "CPU:%d%%",
+						  100 * (difUser + difSystem)
+									/
+				  (difUser + difSystem + difNice + difIdle));
+		}
 	}
 	return buf;
 }
@@ -161,7 +166,13 @@ char* getMemory(char* buf) {
 	tot = atoi(strtok(NULL, " ")); /* get the total memory */
 	strtok(NULL, " "); /* skip kB, \n, MemFree: */
 	free = atoi(strtok(NULL, " ")); /* get free memory */
-	sprintf(buf, "Mem:%d%%", 100 - free * 100/tot);
+
+	if (0 == tot) {
+		strcpy(buf, "Mem:N/A");
+	}
+	else {
+		sprintf(buf, "Mem:%d%%", 100 - free * 100/tot);
+	}
 	return buf;
 }
 
