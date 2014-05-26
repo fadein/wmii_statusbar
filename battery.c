@@ -14,6 +14,7 @@ main (void)
 	memset(&out, '\0', BUFSIZE);
 
 	printf("%s\n", getBatteryTime((char *)&out));
+	printf("%s\n", getBatteryPercent((char *)&out));
 
 	return 0;
 }

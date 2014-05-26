@@ -75,8 +75,13 @@ main(void)
 		strncat(out, getMemory(buf), (size_t) SBAR);
 		strncat(out, " ", (size_t) SBAR);
 
+#ifdef BATTERY_PERCENT
+		strncat(out, getBatteryPercent(buf), (size_t) SBAR);
+		strncat(out, " ", (size_t) SBAR);
+#else
 		strncat(out, getBatteryTime(buf), (size_t) SBAR);
 		strncat(out, " ", (size_t) SBAR);
+#endif
 
 		/* strncat(out, getLoadAve(buf), (size_t) SBAR); */
 		/* strncat(out, " ", (size_t) SBAR); */

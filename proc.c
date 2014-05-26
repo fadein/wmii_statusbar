@@ -237,3 +237,59 @@ char* getBatteryTime(char* buf) {
 	return buf;
 }
 
+/*
+ * get battery percentage
+ */
+char* getBatteryPercent(char* buf) {
+	char *c, *present;
+
+	char discharging;
+	double capacity, remaining;
+
+	readProcFile("acpi/battery/BAT0/state", buf);
+
+	/* printf("read in:\n===\n%s\n===\n\n", buf); */ /*DELETE ME*/
+
+	/* is battery present? */
+	strtok(buf, " ");
+	present = strtok(NULL, " ");
+
+	if (*present == 'y') {
+		/* discharging? */
+		strtok(NULL, " ");
+		strtok(NULL, " ");
+		strtok(NULL, " ");
+		c = strtok(NULL, " \n");
+		if (c) {
+			discharging = *c == 'd' ? '-' : '+';
+			//printf("DISCHARGING:\n===\n%s\n===\n\n", c); /* DELETE ME */
+		}
+
+		/* rate */
+		strtok(NULL, " ");
+		strtok(NULL, " ");
+		strtok(NULL, " ");
+
+		/* remaining capacity, converted to mA minutes */
+		strtok(NULL, " ");
+		strtok(NULL, " ");
+		remaining = atof(strtok(NULL, " "));
+		//printf("REMAINING:\n===\n%d\n===\n\n", remaining); /* DELETE ME */
+
+		/* now read from info the last full capacity */
+		readProcFile("acpi/battery/BAT0/info", buf);
+		strtok(buf, "\n");
+		strtok(NULL, "\n");
+		strtok(NULL, ":");
+		capacity = atof(strtok(NULL, " "));
+
+		snprintf(buf, SBAR, "Bat:%.0f%%%c",
+				remaining / capacity * 100.0,
+				discharging);
+	}
+	else {
+		snprintf(buf, SBAR, "ACpwr");
+	}
+
+	return buf;
+}
