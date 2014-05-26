@@ -3,6 +3,8 @@ CFLAGS=-std=gnu99 -ggdb -Wall -Wextra -pedantic
 WMII_LDFLAGS=-lasound -lm -lixp $(LDFLAGS)
 DWM_LDFLAGS=-lasound -lm -lX11 $(LDFLAGS)
 CC=gcc
+CSC=csc
+CSC_FLAGS=-strip -O5
 
 .PHONY: clean all tags
 
@@ -24,6 +26,10 @@ dwm_statusbar: dwm_statusbar.o $(objs)
 
 battery: battery.c proc.o
 	$(CC) -o $@ $^ $(CFLAGS)
+	strip $@
+
+chicken_battery: chicken_battery.scm proc.o
+	$(CSC) $(CSC_FLAGS) -o $@ $^
 
 clean:
 	rm -f *.o a.out tags wmii_statusbar dwm_statusbar

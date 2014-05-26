@@ -9,7 +9,7 @@
 /*
  * format string for strftime()
  */
-#define TIME_FMT "%a %D %I:%M%p"
+#define TIME_FMT "%a %D %H%M"
 
 
 /*
