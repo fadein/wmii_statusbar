@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <X11/Xlib.h>
+#include <signal.h>
 
 #include "proc.h"
 #include "xkb.h"
@@ -15,6 +16,18 @@
 #include "dwm_statusbar.h"
 
 static Display *dpy;
+static int batteryPercent = 0;
+static int loadAve = 0;
+
+/*
+ * toggle the presentation of certain datas upon receipt of signals
+ */
+void togglePresentation(int signum) {
+	if (signum == SIGUSR1)
+		batteryPercent ^= 1;
+	else if (signum == SIGUSR2)
+		loadAve ^= 1;
+}
 
 /*
  * get date & time
@@ -47,6 +60,12 @@ main(void)
 		return 1;
 	}
 
+	if (SIG_ERR == signal(SIGUSR1, togglePresentation))
+		error_at_line(1, errno, __FILE__, __LINE__, "signal(SIGUSR1) FAIL");
+
+	if (SIG_ERR == signal(SIGUSR2, togglePresentation))
+		error_at_line(1, errno, __FILE__, __LINE__, "signal(SIGUSR1) FAIL");
+
 	if (NULL == (buf = (char*)malloc(sizeof(char) * READBUFFER)))
 		error_at_line(1, errno, __FILE__, __LINE__, "malloc() FAIL");
 
@@ -75,25 +94,20 @@ main(void)
 		strncat(out, getMemory(buf), (size_t) SBAR);
 		strncat(out, " ", (size_t) SBAR);
 
-#ifdef BATTERY_PERCENT
-		strncat(out, getBatteryPercent(buf), (size_t) SBAR);
+		if (batteryPercent == 1)
+			strncat(out, getBatteryPercent(buf), (size_t) SBAR);
+		else
+			strncat(out, getBatteryTime(buf), (size_t) SBAR);
 		strncat(out, " ", (size_t) SBAR);
-#else
-		strncat(out, getBatteryTime(buf), (size_t) SBAR);
-		strncat(out, " ", (size_t) SBAR);
-#endif
 
-		/* strncat(out, getLoadAve(buf), (size_t) SBAR); */
-		/* strncat(out, " ", (size_t) SBAR); */
 
-		strncat(out, getDateTime(buf), (size_t) SBAR);
-		/* strncat(out, " | ", (size_t) SBAR);*/
-
-		/*
-		printf("\n\nthe string:\n");
-		printf("%s", out);
-		printf("\n");
-		*/
+		if (loadAve == 1) {
+			strncat(out, "|", (size_t) SBAR);
+			strncat(out, getLoadAve(buf), (size_t) SBAR);
+			strncat(out, "|", (size_t) SBAR);
+		}
+		else
+			strncat(out, getDateTime(buf), (size_t) SBAR);
 
 		setstatus(out);
 	}
