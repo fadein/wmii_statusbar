@@ -83,8 +83,9 @@ main(void)
 		strncat(out, " ", (size_t) SBAR);
 #endif
 
-		/* strncat(out, getLoadAve(buf), (size_t) SBAR); */
-		/* strncat(out, " ", (size_t) SBAR); */
+		strncat(out, "|", (size_t) SBAR);
+		strncat(out, getLoadAve(buf), (size_t) SBAR);
+		strncat(out, "| ", (size_t) SBAR);
 
 		strncat(out, getDateTime(buf), (size_t) SBAR);
 		/* strncat(out, " | ", (size_t) SBAR);*/

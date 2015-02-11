@@ -46,7 +46,7 @@ char* getLoadAve(char* buf) {
 	for (int i = 0; i <= 2; i++) {
 		c = strchr(c, ' ') + 1;
 	}
-	*c = '\0';
+	*--c = '\0';
 	return buf;
 }
 
