@@ -21,6 +21,7 @@ static int loadAve = 0;
 static int timerMode = 0;
 static int timerSecs = 0;
 static time_t when = 0;
+static int paused = 1;
 
 /*
  * toggle the presentation of certain datas upon receipt of signals
@@ -44,6 +45,14 @@ void togglePresentation(int signum) {
 	else if (signum == SIGQUIT && time(NULL) - when < 2)
 		// only reset the time if this signal happens within a second of SIGWINCH
 		timerSecs = 50 * 60;
+
+	else if (signum == SIGURG)
+		// pause the timer
+		paused ^= 1;
+
+	else if (signum == SIGPOLL)
+		// SIGPOLL adds one minute to the timer
+		timerSecs += 61;
 }
 
 /*
@@ -80,11 +89,13 @@ main(void)
 #define INSTALLSIGNAL(S, F) { if (SIG_ERR == signal(S, F)) \
 	error_at_line(1, errno, __FILE__, __LINE__, "signal(" #S ") FAIL"); }
 
-	INSTALLSIGNAL(SIGUSR1, togglePresentation);
-	INSTALLSIGNAL(SIGUSR2, togglePresentation);
-	INSTALLSIGNAL(SIGHUP, togglePresentation);
-	INSTALLSIGNAL(SIGQUIT, togglePresentation);
+	INSTALLSIGNAL(SIGUSR1,  togglePresentation);
+	INSTALLSIGNAL(SIGUSR2,  togglePresentation);
+	INSTALLSIGNAL(SIGHUP,   togglePresentation);
+	INSTALLSIGNAL(SIGQUIT,  togglePresentation);
 	INSTALLSIGNAL(SIGWINCH, togglePresentation);
+	INSTALLSIGNAL(SIGURG,   togglePresentation);
+	INSTALLSIGNAL(SIGPOLL,  togglePresentation);
 
 	if (NULL == (buf = (char*)malloc(sizeof(char) * READBUFFER)))
 		error_at_line(1, errno, __FILE__, __LINE__, "malloc() FAIL");
@@ -93,11 +104,15 @@ main(void)
 
 	for (;; *out = '\0', sleep(SLEEPYTIME) ) {
 
-		if (timerSecs > 0)
+		if (!paused && timerSecs > 0)
 			timerSecs--;
 
 		if (timerMode) {
-			snprintf(out, (size_t)SBAR, "%02d:%02d", timerSecs / 60, timerSecs % 60);
+			snprintf(out, (size_t)SBAR,
+					paused
+					? "(%02d:%02d)"
+					: "%02d:%02d",
+					timerSecs / 60, timerSecs % 60);
 		}
 		else {
 			/*
