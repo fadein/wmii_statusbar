@@ -15,6 +15,8 @@
 #include "statusbar.h"
 #include "dwm_statusbar.h"
 
+#define TIMER_DURATION 15
+
 static Display *dpy;
 static int batteryPercent = 0;
 static int loadAve = 0;
@@ -44,7 +46,7 @@ void togglePresentation(int signum) {
 
 	else if (signum == SIGQUIT && time(NULL) - when < 2)
 		// only reset the time if this signal happens within a second of SIGWINCH
-		timerSecs = 50 * 60;
+		timerSecs = TIMER_DURATION * 60;
 
 	else if (signum == SIGURG)
 		// pause the timer
