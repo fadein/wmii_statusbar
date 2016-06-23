@@ -3,6 +3,7 @@
 #include <error.h>
 #include <errno.h>
 #include <string.h>
+#include <strings.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -26,8 +27,6 @@
 #include "statusbar.h"
 #include "dwm_statusbar.h"
 
-#define TIMER_DURATION 15
-
 static Display *dpy;
 static int batteryPercent = 0;
 static int loadAve = 0;
@@ -35,6 +34,7 @@ static int timerMode = 0;
 static int timerSecs = 0;
 static time_t when = 0;
 static int paused = 1;
+static int timer_duration = 15;
 
 /*
  * toggle the presentation of certain datas upon receipt of signals
@@ -57,7 +57,7 @@ void togglePresentation(int signum) {
 
 	else if (signum == SIGQUIT && time(NULL) - when < 2)
 		// only reset the time if this signal happens within a second of SIGWINCH
-		timerSecs = TIMER_DURATION * 60;
+		timerSecs = timer_duration * 60;
 
 	else if (signum == SIGURG)
 		// pause the timer
@@ -86,18 +86,50 @@ setstatus(char *str)
 {
 #ifdef DEBUG
 	puts(str);
-	puts("\n");
 #else
 	XStoreName(dpy, DefaultRootWindow(dpy), str);
 	XSync(dpy, False);
 #endif
 }
 
+#ifdef FIFO
+static void cmdParse(char* cmds) {
+	char *c = strtok(cmds, " \n\t");
+	do {
+		if      (!strcasecmp(c, "battery"))
+			batteryPercent ^= 1;
+		else if (!strcasecmp(c, "loadave"))
+			loadAve ^= 1;
+		else if (!strcasecmp(c, "timer"))
+			timerMode ^= 1;
+		else if (!strcasecmp(c, "reset"))
+			timerSecs = timer_duration * 60;
+		else if (!strcasecmp(c, "pause"))
+			paused ^= 1;
+		else if (!strcasecmp(c, "resume"))
+			paused = 0;
+		else if (*c == '+')
+			timerSecs += (60 * atoi((const char*)++c)) + 1;
+		else if (*c == '-')
+			timerSecs -= (60 * atoi((const char*)++c)) + 1;
+		else if (*c == '=') {
+			timer_duration = atoi((const char*)++c);
+			timerSecs = timer_duration * 60 + 1;
+		}
+	} while (NULL != (c = strtok(NULL, " \n\t")));
+}
+#endif
+
 int
 main(void)
 {
 	char out[SBAR];
-	char *buf;
+	char *buf; 
+
+#ifdef FIFO
+	char *fifoCmd;
+	fifoInit();
+#endif
 
 	if (!(dpy = XOpenDisplay(NULL))) {
 		fprintf(stderr, "XOpenDisplay() FAIL\n");
@@ -119,11 +151,14 @@ main(void)
 		error_at_line(1, errno, __FILE__, __LINE__, "malloc() FAIL");
 
 	memset(&out, '\0', (size_t)SBAR);
-	fifoInit();
 
 	for (;; *out = '\0', sleep(SLEEPYTIME) ) {
 
-		fifoCheck();
+#ifdef FIFO
+		fifoCmd = fifoCheck();
+		if (*fifoCmd)
+			cmdParse(fifoCmd);
+#endif
 
 		if (!paused && timerSecs > 0)
 			timerSecs--;

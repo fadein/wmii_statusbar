@@ -5,7 +5,7 @@
 
 
 int fifoInit(void);
-void fifoCheck(void);
+char* fifoCheck(void);
 int fifoFree(void);
 
 

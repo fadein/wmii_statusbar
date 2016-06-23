@@ -34,7 +34,7 @@ int fifo, n;
 fd_set readFD;
 struct timeval timeout;
 char buf[FIFO_BUFSZ];
-unsigned i = 0; // DELETE ME
+//,unsigned i = 0; // DELETE ME
 
 int fifoInit() {
 	mkfifoUnlessExists();
@@ -46,46 +46,48 @@ int fifoFree(void) {
 	return close(fifo);
 }
 
-void fifoCheck(void) {
-		printf("tick %d\n", i); // DELETE ME
-		FD_SET(fifo, &readFD);
-		timeout.tv_sec = 0;
-		timeout.tv_usec = 1;
-		n = select(fifo + 1, &readFD, NULL, NULL, &timeout);
-		if (n < 0) {
-			perror("select");
-			return;
-		}
-		else if (n) {
-			printf("n = %d\n", n); //DELETE ME
-			if (FD_ISSET(fifo, &readFD)) {
-				ssize_t bytes = 0;
-				size_t totes = 0;
-				while (1) {
-					bytes = read(fifo, buf, sizeof(buf));
-					if (bytes > 0) {
-						totes += bytes;
-						printf("!read %zd bytes into buf\n", bytes); // DELETE ME
+char* fifoCheck(void) {
+	//,printf("%d: tick %d\n", getpid(), i); // DELETE ME
+	FD_SET(fifo, &readFD);
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 1;
+	buf[0] = '\0';
+	n = select(fifo + 1, &readFD, NULL, NULL, &timeout);
+	if (n < 0) {
+		perror("select");
+	}
+	else if (n) {
+		//,printf("n = %d\n", n); //DELETE ME
+		if (FD_ISSET(fifo, &readFD)) {
+			ssize_t bytes = 0;
+			size_t totes = 0;
+			while (1) {
+				bytes = read(fifo, buf, sizeof(buf));
+				if (bytes > 0) {
+					totes += bytes;
+					//,printf("!read %zd bytes into buf\n", bytes); // DELETE ME
+				}
+				else {
+					if (errno == EWOULDBLOCK) {
+						//,printf("@read %zd bytes in total\n", totes); // DELETE ME
+						if (totes < sizeof(buf))
+							buf[totes] = '\0';
+						else
+							buf[sizeof(buf)] = '\0';
+						//,printf("%s\n", buf); // DELETE ME
+						break;
 					}
 					else {
-						if (errno == EWOULDBLOCK) {
-							printf("@read %zd bytes in total\n", totes); // DELETE ME
-							if (totes < sizeof(buf))
-								buf[totes] = '\0';
-							else
-								buf[sizeof(buf)] = '\0';
-							printf("%s\n", buf); // DELETE ME
-							break;
-						}
-						else {
-							perror("read");
-							return;
-						}
+						perror("read");
+						buf[0] = '\0';
+						break;
 					}
 				}
 			}
 		}
-		printf("tock %d\n", i++); // DELETE ME
+	}
+	//,printf("%d: tock %d\n", getpid(), i); // DELETE ME
+	return buf;
 }
 
 #endif
