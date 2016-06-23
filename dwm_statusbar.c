@@ -19,6 +19,10 @@
 #include "alsavolume.h"
 #endif
 
+#ifdef FIFO
+#include "fifo.h"
+#endif
+
 #include "statusbar.h"
 #include "dwm_statusbar.h"
 
@@ -115,8 +119,11 @@ main(void)
 		error_at_line(1, errno, __FILE__, __LINE__, "malloc() FAIL");
 
 	memset(&out, '\0', (size_t)SBAR);
+	fifoInit();
 
 	for (;; *out = '\0', sleep(SLEEPYTIME) ) {
+
+		fifoCheck();
 
 		if (!paused && timerSecs > 0)
 			timerSecs--;

@@ -1,4 +1,4 @@
-FEATURES=DEBUG ALSA XKB
+FEATURES=DEBUG ALSA XKB FIFO
 
 CFLAGS=-std=gnu99 -ggdb -Wall -Wextra -pedantic $(addprefix -D,$(FEATURES))
 
@@ -15,9 +15,10 @@ all: dwm_statusbar
 objs = proc.o
 $(if $(findstring ALSA,$(FEATURES)),$(eval objs += alsavolume.o))
 $(if $(findstring XKB,$(FEATURES)),$(eval objs += xkb.o))
+$(if $(findstring FIFO,$(FEATURES)),$(eval objs += fifo.o))
 
 wmii_statusbar.o: Makefile wmii_statusbar.h proc.h alsavolume.h
-dwm_statusbar.o: Makefile dwm_statusbar.h proc.h alsavolume.h xkb.h statusbar.h
+dwm_statusbar.o: Makefile dwm_statusbar.h proc.h alsavolume.h xkb.h statusbar.h fifo.h
 
 
 wmii_statusbar: wmii_statusbar.c $(objs)
