@@ -10,8 +10,15 @@
 #include <signal.h>
 
 #include "proc.h"
+
+#ifdef XKB
 #include "xkb.h"
+#endif
+
+#ifdef ALSA
 #include "alsavolume.h"
+#endif
+
 #include "statusbar.h"
 #include "dwm_statusbar.h"
 
@@ -73,8 +80,13 @@ char* getDateTime(char* buf) {
 void
 setstatus(char *str)
 {
+#ifdef DEBUG
+	puts(str);
+	puts("\n");
+#else
 	XStoreName(dpy, DefaultRootWindow(dpy), str);
 	XSync(dpy, False);
+#endif
 }
 
 int
@@ -124,13 +136,17 @@ main(void)
 			//strncat(out, getWifi(buf), (size_t)SBAR);
 			//strncat(out, " | ", (size_t) SBAR);
 
+#ifdef ALSA
 			strncat(out, "Vol:", (size_t)SBAR);
 			strncat(out, getAlsaVolume("Master"), (size_t)SBAR);
 			strncat(out, " ", (size_t) SBAR);
+#endif
 
+#ifdef XKB
 			strncat(out, "Kb:", (size_t)SBAR);
 			strncat(out, xkbGetGroup(buf, (size_t) 2), (size_t)SBAR);
 			strncat(out, " ", (size_t) SBAR);
+#endif
 
 			strncat(out, getCPU(buf), (size_t)SBAR);
 			strncat(out, " ", (size_t) SBAR);
@@ -138,11 +154,13 @@ main(void)
 			strncat(out, getMemory(buf), (size_t) SBAR);
 			strncat(out, " ", (size_t) SBAR);
 
+#ifdef BATTERY
 			if (batteryPercent == 1)
 				strncat(out, getBatteryPercent(buf), (size_t) SBAR);
 			else
 				strncat(out, getBatteryTime(buf), (size_t) SBAR);
 			strncat(out, " ", (size_t) SBAR);
+#endif
 
 			if (loadAve == 1) {
 				strncat(out, "|", (size_t) SBAR);

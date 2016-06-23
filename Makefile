@@ -1,4 +1,6 @@
-CFLAGS=-std=gnu99 -ggdb -Wall -Wextra -pedantic
+FEATURES=DEBUG ALSA XKB
+
+CFLAGS=-std=gnu99 -ggdb -Wall -Wextra -pedantic $(addprefix -D,$(FEATURES))
 
 WMII_LDFLAGS=-lasound -lm -lixp $(LDFLAGS)
 DWM_LDFLAGS=-lasound -lm -lX11 $(LDFLAGS)
@@ -10,10 +12,10 @@ CSC_FLAGS=-strip -O5
 
 all: dwm_statusbar
 
-objs = alsavolume.o proc.o xkb.o
-alsavolume.o: Makefile
-proc.o: Makefile
-xkb.o: Makefile
+objs = proc.o
+$(if $(findstring ALSA,$(FEATURES)),$(eval objs += alsavolume.o))
+$(if $(findstring XKB,$(FEATURES)),$(eval objs += xkb.o))
+
 wmii_statusbar.o: Makefile wmii_statusbar.h proc.h alsavolume.h
 dwm_statusbar.o: Makefile dwm_statusbar.h proc.h alsavolume.h xkb.h statusbar.h
 

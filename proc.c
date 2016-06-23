@@ -177,6 +177,8 @@ char* getMemory(char* buf) {
 }
 
 
+#ifdef BATTERY
+
 /*
  * get battery time left
  */
@@ -293,3 +295,5 @@ char* getBatteryPercent(char* buf) {
 
 	return buf;
 }
+
+#endif
