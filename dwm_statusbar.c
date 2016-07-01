@@ -34,7 +34,7 @@ static int timerMode = 0;
 static int timerSecs = 0;
 static time_t when = 0;
 static int paused = 1;
-static int timer_duration = 15;
+static int timer_duration = 50;
 
 /*
  * toggle the presentation of certain datas upon receipt of signals
@@ -100,12 +100,20 @@ static void cmdParse(char* cmds) {
 			batteryPercent ^= 1;
 		else if (!strcasecmp(c, "loadave"))
 			loadAve ^= 1;
-		else if (!strcasecmp(c, "timer"))
+		else if (!strcasecmp(c, "toggle"))
 			timerMode ^= 1;
+		else if (!strcasecmp(c, "statusbar"))
+			timerMode = 0;
+		else if (!strcasecmp(c, "timer"))
+			timerMode = 1;
 		else if (!strcasecmp(c, "reset"))
 			timerSecs = timer_duration * 60;
 		else if (!strcasecmp(c, "pause"))
 			paused ^= 1;
+		else if (!strcasecmp(c, "stop"))
+			paused = 1;
+		else if (!strcasecmp(c, "play"))
+			paused = 0;
 		else if (!strcasecmp(c, "resume"))
 			paused = 0;
 		else if (*c == '+')

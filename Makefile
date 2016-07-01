@@ -1,4 +1,9 @@
-FEATURES=DEBUG ALSA XKB FIFO
+# Valid features are:
+# BATTERY - read battery stats from /proc/acpi/battery/BAT0/state
+# ALSA    - query ALSA for sound card volume
+# XKB     - query XKB for current X11 keyboard layout
+# FIFO    - allow for control through fifo at /tmp/dwm_statusbar
+FEATURES=BATTERY ALSA XKB FIFO
 
 CFLAGS=-std=gnu99 -ggdb -Wall -Wextra -pedantic $(addprefix -D,$(FEATURES))
 
