@@ -10,6 +10,12 @@
 #include "statusbar.h"
 
 /*
+ * Where proc files are located
+ */
+#define PROC "/proc/"
+
+
+/*
  * Read READBUFFER bytes from the specified /proc file
  * into *uf, 
  * also return pointer to buf
@@ -18,7 +24,7 @@ static char* readProcFile(const char* file, char* buf) {
 	static FILE *info;
 	static char procpath[PATH_MAX];
 
-	strcpy((char*)&procpath, "/proc/");
+	strcpy((char*)&procpath, PROC);
 	strcat((char*)&procpath, file);
 
 	if (NULL == (info = fopen((char*)&procpath, "r"))) {
@@ -180,7 +186,26 @@ char* getMemory(char* buf) {
 #ifdef BATTERY
 
 /*
- * get battery time left
+ * get battery time left from /proc/acpi/battery/BAT0/state
+ *
+ * Charging:
+ * =========
+ * present:                 yes
+ * capacity state:          ok
+ * charging state:          charged
+ * present rate:            0 mA
+ * remaining capacity:      4515 mAh
+ * present voltage:         12482 mV
+ *
+ * Discharging:
+ * ============
+ * present:                 yes
+ * capacity state:          ok
+ * charging state:          discharging
+ * present rate:            1152 mA
+ * remaining capacity:      4514 mAh
+ * present voltage:         12289 mV
+ *
  */
 char* getBatteryTime(char* buf) {
 	char *present, *discharging;
@@ -189,29 +214,41 @@ char* getBatteryTime(char* buf) {
 
 	readProcFile("acpi/battery/BAT0/state", buf);
 
-	/* printf("read in:\n===\n%s\n===\n\n", buf); */ /*DELETE ME*/
+#ifdef DEBUG
+	printf("read in:\n===\n%s\n===\n\n", buf);
+#endif
 
 	/* is battery present? */
 	strtok(buf, " ");
 	present = strtok(NULL, " ");
-	/* printf("PRESENT: %s\n", present); */ /* DELETE ME */
-	/* printf("PRESENT? %c\n\n", *present == 'y' ? 'y' : 'n'); */ /* DELETE ME */
+#ifdef DEBUG
+	printf("PRESENT: %s\n", present);
+	printf("PRESENT? %c\n\n", *present == 'y' ? 'y' : 'n');
+#endif
 
 	if (*present == 'y') {
 		/* discharging? */
-		strtok(NULL, " ");
-		strtok(NULL, " ");
-		strtok(NULL, " ");
-		discharging = strtok(NULL, " ");
-		/* printf("DISCHARGING:\n===\n%s\n===\n\n", discharging); */ /* DELETE ME */
-		/* printf("DISCHARGING? %c\n\n", *discharging == 'd' ? 'y' : 'n'); */ /* DELETE ME */
+		char *
+		c = strtok(NULL, ":");
+		c = strtok(NULL, ":");
+		discharging = strtok(NULL, "\n");
+		for (; *discharging == ' '; discharging++)
+			;
+
+#ifdef DEBUG
+		printf("DISCHARGING:\n===\n%s\n===\n\n", discharging);
+		printf("DISCHARGING? %c\n\n", *discharging == 'd' ? 'y' : 'n');
+#endif
 
 		/* rate */
-		strtok(NULL, " ");
+		c = strtok(NULL, ":");
 		rate = atoi(strtok(NULL, " "));
-		/* printf("RATE:\n===\n%d\n===\n\n", rate); */ /* DELETE ME */
+#ifdef DEBUG
+		printf("RATE:\n===\n%d\n===\n\n", rate);
+#endif
 
-		if (0 == rate) {
+
+		if (!rate) {
 			snprintf(buf, SBAR, "Bat:FULL%c",
 					*discharging == 'd' ? '-' : '+');
 		}
@@ -220,7 +257,9 @@ char* getBatteryTime(char* buf) {
 			strtok(NULL, " ");
 			strtok(NULL, " ");
 			remaining = 60 * atoi(strtok(NULL, " "));
-			/* printf("REMAINING:\n===\n%d\n===\n\n", remaining); */ /* DELETE ME */
+#ifdef DEBUG
+			printf("REMAINING:\n===\n%d\n===\n\n", remaining);
+#endif
 
 			minutes = remaining / rate;
 			hours = minutes / 60;
@@ -250,7 +289,9 @@ char* getBatteryPercent(char* buf) {
 
 	readProcFile("acpi/battery/BAT0/state", buf);
 
-	/* printf("read in:\n===\n%s\n===\n\n", buf); */ /*DELETE ME*/
+#ifdef DEBUG
+	printf("read in:\n===\n%s\n===\n\n", buf);
+#endif
 
 	/* is battery present? */
 	strtok(buf, " ");
@@ -264,7 +305,9 @@ char* getBatteryPercent(char* buf) {
 		c = strtok(NULL, " \n");
 		if (c) {
 			discharging = *c == 'd' ? '-' : '+';
-			//printf("DISCHARGING:\n===\n%s\n===\n\n", c); /* DELETE ME */
+#ifdef DEBUG
+			printf("DISCHARGING:\n===\n%s\n===\n\n", c);
+#endif
 		}
 
 		/* rate */
@@ -276,7 +319,9 @@ char* getBatteryPercent(char* buf) {
 		strtok(NULL, " ");
 		strtok(NULL, " ");
 		remaining = atof(strtok(NULL, " "));
-		//printf("REMAINING:\n===\n%d\n===\n\n", remaining); /* DELETE ME */
+#ifdef DEBUG
+		printf("REMAINING:\n===\n%f\n===\n\n", remaining);
+#endif
 
 		/* now read from info the last full capacity */
 		readProcFile("acpi/battery/BAT0/info", buf);

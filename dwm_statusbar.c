@@ -132,7 +132,7 @@ int
 main(void)
 {
 	char out[SBAR];
-	char *buf; 
+	char *buf;
 
 #ifdef FIFO
 	char *fifoCmd;

@@ -40,10 +40,11 @@ chicken_battery: chicken_battery.scm proc.o
 	$(CSC) $(CSC_FLAGS) -o $@ $^
 
 clean:
-	rm -f *.o a.out tags wmii_statusbar dwm_statusbar
+	rm -f *.o a.out tags cscope.out wmii_statusbar dwm_statusbar
 
 tags:
 	ctags *
+	cscope -b -q
 
 simple_volume.o: simple_volume.c
 	gcc -c -o $@ $^ $(CFLAGS)

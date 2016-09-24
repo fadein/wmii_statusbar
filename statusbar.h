@@ -1,6 +1,8 @@
 #ifndef STATUSBAR_H
 #define STATUSBAR_H
 
+#undef DEBUG
+
 /*
  * Max number of bytes to read from a /proc file
  */
